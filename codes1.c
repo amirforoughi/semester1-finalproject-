@@ -1,6 +1,13 @@
 
 
-
+struct map_evalue{
+    int direct1;
+    int direct2;
+    int direct3;
+    int direct4;
+    int direct5;
+    int direct6;
+};
 
 struct cell * creat_cellhead(char *namep, int xp , int yp , int energyp){
     struct cell * newhead = malloc( sizeof(struct cell) );
@@ -104,7 +111,7 @@ void movecell(struct cell *head , int oldx , int oldy , int coor_number){
 }
 int checkmove1( int xp , int yp , int n){
     int evalue_result;
-        //do not want to make this function complicated
+        //do not want to make this function complicated thats why I use checkmove2 and checkmove3
     if(xp == 0){
         evalue_result = checkmove2( xp , yp , n );
         return evalue_result;
@@ -226,58 +233,113 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
     }
      if( locate == 6 ){
         //because we know where it is and where can it go...
-        result.direct1 = 0;
-        result.direct2 = 1;
-        result.direct3 = 0;
-        result.direct4 = 0;
-        result.direct5 = 1;
-        result.direct6 = 1;
-        //if there are cells in other locations
-        if( map[n-2][n-1].room == 1 ){
-            result.direct2 = 0;
-        }
-        if( map[n-2][n-2].room == 1 ){
-            result.direct6 = 0;
-        }
-        if( map[n-1][n-2].room == 1 ){
-            result.direct5 = 0;
-        }
-        //what if it is forbidden
-        if( map[n-2][n-1].type == 3){
-            result.direct2 = 0;
-        }
-        if( map[n-2][n-2].type == 3){
-            result.direct6 = 0;
-        }
-        if( map[n-1][n-2].type == 3){
-            result.direct5 = 0;
-        }
-        return result;
-    }
+		if( n%2 ==0 ){
+			result.direct1 = 0;
+			result.direct2 = 1;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 1;
+			result.direct6 = 1;
+			//if there are cells in other locations
+			if( map[n-2][n-1].room == 1 ){
+				result.direct2 = 0;
+			}
+			if( map[n-2][n-2].room == 1 ){
+				result.direct6 = 0;
+			}
+			if( map[n-1][n-2].room == 1 ){
+				result.direct5 = 0;
+			}
+			//what if it is forbidden
+			if( map[n-2][n-1].type == 3){
+				result.direct2 = 0;
+			}
+			if( map[n-2][n-2].type == 3){
+				result.direct6 = 0;
+			}
+			if( map[n-1][n-2].type == 3){
+				result.direct5 = 0;
+			}
+			return result;
+		}
+		
+		else{
+			result.direct1 = 0;
+			result.direct2 = 1;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 0;
+			result.direct6 = 1;
+			//considering full places
+			if( map[yp-1][xp].room == 1 ){
+				result.direct2 = 0;
+			}
+			if( map[yp][xp-1].room == 1 ){
+				result.direct6 = 0;
+			}
+			//forbidden places
+			if( map[yp-1][xp].type == 3 ){
+				result.direct2 = 0;
+			}
+			if( map[yp][xp-1].type == 3 ){
+				result.direct6 = 0;
+			}
+		}
+	}
     if( locate == 8 ){
-        //because we know where it is and where can it go...
-        result.direct1 = 1;
-        result.direct2 = 0;
-        result.direct3 = 0;
-        result.direct4 = 0;
-        result.direct5 = 1;
-        result.direct6 = 0;
-        //if there are cells in other locations
-        if( map[0][n-2].room == 1 ){
-            result.direct5 = 0;
-        }
-        if( map[1][n-1].room == 1 ){
-            result.direct1 = 0;
-        }
-        //what if it is forbidden
-        if( map[0][n-2].type == 3){
-            result.direct5 = 0;
-        }
-        if( map[1][n-1].type == 3){
-            result.direct1 = 0;
-        }
-        return result;
-    }
+		if( n%2 == 0 ){
+			//because we know where it is and where can it go without considering the probable exceptions ...
+			result.direct1 = 1;
+			result.direct2 = 0;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 1;
+			result.direct6 = 0;
+			//if there are cells in other locations
+			if( map[0][n-2].room == 1 ){
+				result.direct5 = 0;
+			}
+			if( map[1][n-1].room == 1 ){
+				result.direct1 = 0;
+			}
+			//what if it is forbidden
+			if( map[0][n-2].type == 3){
+				result.direct5 = 0;
+			}
+			if( map[1][n-1].type == 3){
+				result.direct1 = 0;
+			}
+			return result;
+		}
+		else{
+			result.direct1 = 1;
+			result.direct2 = 0;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 1;
+			result.direct6 = 1;
+			//considering full rooms
+			if( map[yp+1][xp].room == 1 ){
+				result.direct1 = 0;
+			}
+			if( map[yp+1][xp-1].room == 1 ){
+				result.direct5 = 0;
+			}
+			if( map[yp][xp-1].room == 1 ){
+				result.direct6 = 0;
+			}
+			//forbidden places
+			if( map[yp+1][xp].type == 3 ){
+				result.direct1 = 0;
+			}
+			if( map[yp+1][xp-1].type == 3 ){
+				result.direct5 = 0;
+			}
+			if( map[yp][xp-1].type == 3 ){
+				result.direct6 = 0;
+			}
+		}
+	}
 //same thing I do for the rest
     if( locate == 2 ){
         result.direct1 = 1;
@@ -315,39 +377,77 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         return result;
     }
     if( locate == 7 ){
-        result.direct1 = 1;
-        result.direct2 = 1;
-        result.direct3 = 0;
-        result.direct4 = 0;
-        result.direct5 = 1;
-        result.direct6 = 1;
-        //there are cells
-        if( map[yp+1][xp].room == 1 ){
-            result.direct1 = 0;
-        }
-        if( map[yp-1][xp].room == 1 ){
-            result.direct2 = 0;
-        }
-        if( map[yp-1][xp-1].room == 1 ){
-            result.direct6 = 0;
-        }
-        if( map[yp][xp-1].room == 1 ){
-            result.direct5 = 0;
-        }
-        //forbidden places
-        if( map[yp+1][xp].type == 3 ){
-            result.direct1 = 0;
-        }
-        if( map[yp-1][xp].type == 3){
-            result.direct2 = 0;
-        }
-        if( map[yp-1][xp-1].type == 3 ){
-            result.direct3 = 0;
-        }
-        if( map[yp][xp-1].type == 3 ){
-            result.direct4 = 0;
-        }
-        return result;
+		
+		if( n%2 == 0 ){
+			result.direct1 = 1;
+			result.direct2 = 1;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 1;
+			result.direct6 = 1;
+			//there are cells
+			if( map[yp+1][xp].room == 1 ){
+				result.direct1 = 0;
+			}
+			if( map[yp-1][xp].room == 1 ){
+				result.direct2 = 0;
+			}
+			if( map[yp-1][xp-1].room == 1 ){
+				result.direct6 = 0;
+			}
+			if( map[yp][xp-1].room == 1 ){
+				result.direct5 = 0;
+			}
+			//forbidden places
+			if( map[yp+1][xp].type == 3 ){
+				result.direct1 = 0;
+			}
+			if( map[yp-1][xp].type == 3){
+				result.direct2 = 0;
+			}
+			if( map[yp-1][xp-1].type == 3 ){
+				result.direct3 = 0;
+			}
+			if( map[yp][xp-1].type == 3 ){
+				result.direct4 = 0;
+			}
+			return result;
+		}
+		
+		else{
+			result.direct1 = 1;
+			result.direct2 = 1;
+			result.direct3 = 0;
+			result.direct4 = 0;
+			result.direct5 = 1;
+			result.direct6 = 1;
+			//there are cells
+			if( map[yp+1][xp].room == 1 ){
+				result.direct1 = 0;
+			}
+			if( map[yp-1][xp].room == 1 ){
+				result.direct2 = 0;
+			}
+			if( map[yp+1][xp-1].room == 1 ){
+				result.direct5 = 0;
+			}
+			if( map[yp][xp-1].room == 1 ){
+				result.direct6 = 0;
+			}
+			//forbidden places
+			if( map[yp+1][xp].type == 3 ){
+				result.direct1 = 0;
+			}
+			if( map[yp-1][xp].type == 3 ){
+				result.direct2 = 0;
+			}
+			if( map[yp+1][xp-1].type == 3 ){
+				result.direct5 = 0;
+			}
+			if( map[yp][xp-1].type == 3 ){
+				result.direct6 = 0;
+			}
+		}
     }
     if( locate == 10 ){
         result.direct1 = 1;
@@ -583,42 +683,6 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         }
     }
     exit(-3);
-}
-struct map_evalue checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
-    struct cell * current = head;
-    struct map_evalue result;
-    for( ; current != NULL ; current = current->next ){
-        if( strcmp(current->name,namep) == namep ){
-            result=checkcell( current->x , current->y , checkmove1(current->x , current->y , n), map , n);
-            break;
-        }
-    }
-    //can be changed to anything e.g making places random
-    if( result.direct1 )
-        return 1;
-    else if( result.direct2 )
-        return 2;
-    else if( result.direct3 )
-        return 3;
-    else if( result.direct4 )
-        return 4;
-    else if( result.direct5 )
-        return 5;
-    else if( result.direct6 )
-        return 6;
-    else
-        exit(-4); else if( result.direct2 )
-        return 2;
-}
-
-
-
-
-
-
-
-struct cell * split( struct cell * head , char * namep , int direct){
-
 }
 /*
 struct cell * slpit(struct cell *head , char *namep , int xp , int yp , int n){
