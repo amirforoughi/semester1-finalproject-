@@ -10,7 +10,7 @@
 #include <dir.h>
 */
 #include"myheaders.h"
-#define size 9
+#define size 4
 /*
 struct map_evalue{
     //these are the directions which cell can move
@@ -95,6 +95,7 @@ struct cell* deletecell(struct cell * head , char * namep , int xp, int yp){
     }
 }
 char * rand_string(void) { // reserves a place for NULL
+    srand(time(0));
     char *str = malloc( (size+1) * sizeof(char) );
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     for ( size_t i = 0 ; i < size ; i++ ) {
@@ -766,8 +767,8 @@ int energy_permission(char * namep , struct cell * head , struct mapEl **map){
      if(  map[current->y][current->x].type > 4 ){
              //if energy is more than 15
             if(   map[current->y][current->x].type > 15  ){
-                    return 1;
                  (map[current->y][current->x].type) -= 15;
+                    return 1;
             }
              //if energy is less than 15
             else{
@@ -812,7 +813,7 @@ int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
 
 
 
-struct cell * split( struct cell * head , char * namep , int direct){
+struct cell * split( struct cell * head , char * namep , int direct , struct mapEl **map){
 	char * randName1 , * randName2 ;
 	struct cell * current = head ;
 	for( ; current != NULL ; current = current->next ){
@@ -827,37 +828,47 @@ struct cell * split( struct cell * head , char * namep , int direct){
     addend( head , randName1 , xp , yp , 40 );
     if( direct == 1 ){
         addend( head , randName1 , xp , yp+1 , 40 );
+        map[yp+1][xp].room = 1;
     }
     else if( direct == 2 ){
         addend( head , randName2 , xp , yp-1 , 40 );
+        map[yp-1][xp].room = 1;
     }
     else{
         if( xp%2 == 0 ){
             if( direct == 3 ){
                 addend( head , randName2 , xp+1 , yp+1 , 40 );
+                map[yp+1][xp+1].room = 1;
             }
             else if( direct == 4 ){
                 addend( head , randName2 , xp+1 , yp , 40 );
+                map[yp][xp+1].room = 1;
             }
             else if( direct == 5 ){
                 addend( head , randName1 , xp-1 , yp+1 , 40 );
+                map[yp+1][xp-1].room = 1;
             }
             else if( direct == 6 ){
                 addend( head , randName2 , xp-1 , yp , 40 );
+                map[yp][xp-1].room = 1;
             }
         }
         else{
             if( direct == 3 ){
                 addend( head , randName2 , xp+1 , yp , 40 );
+                map[yp][xp+1].room = 1;
             }
             else if( direct == 4 ){
                 addend( head , randName2 , xp+1 , yp-1 , 40 );
+                map[yp-1][xp+1].room = 1;
             }
             else if( direct == 5 ){
                 addend( head , randName2 , xp-1 , yp , 40 );
+                map[yp][xp-1].room = 1;
             }
             else if( direct == 6 ){
                 addend( head , randName2 , xp-1 , yp-1 , 40 );
+                map[yp-1][xp-1].room = 1;
             }
         }
     }
@@ -887,6 +898,7 @@ void get_energy( struct cell * head , int permission , char * namep ){
     }
 }
 void randomInit(struct cell * head , struct mapEl **map , int n ){
+    srand(time(0));
     struct cell * current ;
     int holdx;
     int holdy;
@@ -902,16 +914,44 @@ void randomInit(struct cell * head , struct mapEl **map , int n ){
     }
 }
 void temp_emptyMapInit(struct mapEl **map , int n){
-    int holdtype=4;
     int i , j ;
     for( i=0 ; i<n ; i++ ){
         for( j=0;j<n;j++){
             map[i][j].type=4;
-            map[i][j].room=0
+            map[i][j].room=0;
         }
     }
 }
-
+void temp_addend( struct cell * head ){
+    struct cell * current = head;
+    for(int  i=0 ; i<3 ; current = current->next , i++){
+        if( current->next == NULL ){
+            char * rndname=rand_string();
+            current->next = malloc( sizeof( struct cell ) );
+            current = current->next ;
+            current->next = NULL;
+            strcpy( current->name , rndname );
+            current = head;
+        }
+    }
+    return;
+}
+void Mapinit(char * buff , int n , struct mapEl **map){
+    int k = 0;
+    for( int i=0 ; i<n ; i++ ){
+        for( int j=0 ; j<n && k<n*n ; j++ ){
+            if( buff[k] == '1'){
+                map[i][j].type = 100;
+                map[i][j].room = 0;
+            }
+            else{
+                map[i][j].type = buff[k] - '0';
+                map[i][j].room = 0;
+            }
+            k++;
+        }
+    }
+}
 
 
 

@@ -37,7 +37,7 @@ void SetColor(int ForgC)
 
 void showMap(int n2 , struct cell * head , struct mapEl** map){
     char c;
-    int n =  int n = 3 * n2 +2;;
+    int n = 3 * n2 +2;
     /*
     if( n2 == 3)
         n = 11;
@@ -62,7 +62,7 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
             }
             if( i == 1){
                 for(j=0;j<m;j++){
-                        printf("I       I_______");
+                        printf("|       |_______");
                      }
                      // printf("I");
                         printf("\n");
@@ -70,36 +70,36 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
             }
 
             if (i == n-1){
-                printf("        I_______");
+                printf("        |_______");
                      for(j=0;j<m-1;j++){
-                        printf("I       I_______");
+                        printf("|       |_______");
                      }
-                      printf("I");
+                      printf("|");
                         printf("\n");
                         continue;
             }
             if (i%3 == 1){
                      for(j=0;j<m;j++){
-                        printf("I       I_______");
+                        printf("|       |_______");
                      }
-                      printf("I");
+                      printf("|");
                         printf("\n");
             }
             if (i%3 == 2){
                      for(j=0;j<m;j++){
                         c=check_block(head , (n-2)/3 , (i+1)/3 , 2*j+1);
-                        printf("I  %c   0I       ",c);
+                        printf("|  %c   0|       ",c);
 
                      }
-                      printf("I");
+                      printf("|");
                         printf("\n");
             }
             if (i%3 == 0){
                      for(j=0;j<m;j++){
                         c=check_block(head ,  (n-2)/3  , (i+2)/3 , 2*j+2);
-                        printf("I_______I  %c   0",c);
+                        printf("|_______|  %c   0",c);
                      }
-                      printf("I");
+                      printf("|");
                         printf("\n");
             }
         }
@@ -115,10 +115,11 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
 */
 // column does not have a zerro
 char check_block( struct cell * head , int n , int column , int row){
+    //SetColor(11);
     struct cell * current = head ;
 
     //struct cell * current2 = head ;
-    static int j = 0;
+    //static int j = 0;
     int yp , xp = row-1;
     for( yp = n-column , xp = row-1 ; current != NULL  ; current = current->next ){
         if( current->x == xp && current->y == yp ){
@@ -127,6 +128,18 @@ char check_block( struct cell * head , int n , int column , int row){
 
     }
     return ' ';
+}
+
+void show_mainmenu(void){
+
+    SetColor(12);
+    printf("[1]Load\n");
+    SetColor(5);
+    printf("[2]New single player game\n");
+    SetColor(11);
+    printf("[3]New multiplayer game\n");
+    SetColor(4);
+    printf("[4]Exit\n");
 }
 
 
