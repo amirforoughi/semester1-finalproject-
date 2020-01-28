@@ -45,7 +45,7 @@ struct mapEl** creat_map(int n){
     return map;
 }
 struct cell * creat_cellhead(char *namep, int xp , int yp , int energyp){
-    struct cell * newhead = malloc( sizeof(struct cell) );
+    struct cell * newhead =(struct cell*)malloc( sizeof(struct cell) );
     newhead->next = NULL;
     newhead->x = xp ;
     newhead->y = yp ;
@@ -106,36 +106,43 @@ char * rand_string(void) { // reserves a place for NULL
     return str;
 }
 
-void movecell(struct cell *head , int oldx , int oldy , int coor_number){
+void movecell(struct cell *head , int xp , int yp , int coor_number , struct mapEl **map){
     struct cell * current = head;
+    map[yp][xp].room = 0;
     for(; current != NULL ; current = current->next){
-        if( current->x == oldx && current->y == oldy )
+        if( current->x == xp && current->y == yp )
             break;
     }
     if( current == NULL )
         exit(-2);
-    if( oldx%2 == 0){
+    if( xp%2 == 0){
         switch(coor_number){
         case 1 :
             (current->y)++;
+            map[yp+1][xp].room = 1;
             break;
         case 2 :
             (current->y)--;
+            map[yp-1][xp].room = 1;
             break;
         case 3 :
             (current->y)++;
             (current->x)++;
+            map[yp+1][xp+1].room = 1;
             break;
         case 4 :
             (current->x)++;
+            map[yp][xp+1].room = 1;
             break;
         case 5 :
             (current->y)++;
             (current->x)--;
+            map[yp+1][xp-1].room = 1;
             break;
 
         case 6 :
             (current->x)--;
+            map[yp][xp-1].room = 1;
             break;
         }
     }
@@ -143,31 +150,37 @@ void movecell(struct cell *head , int oldx , int oldy , int coor_number){
         switch(coor_number){
         case 1 :
             (current->y)++;
+            map[yp+1][xp].room = 1;
             break;
         case 2 :
             (current->y)--;
+            map[yp-1][xp].room = 1;
             break;
         case 3 :
             //(current->y)++;
             (current->x)++;
+            map[yp][xp+1].room = 1;
             break;
         case 4 :
             (current->y)--;
             (current->x)++;
+            map[yp-1][xp+1].room = 1;
             break;
         case 5 :
             //(current->y)++;
             (current->x)--;
+            map[yp][xp-1].room = 1;
             break;
 
         case 6 :
             (current->y)--;
             (current->x)--;
+            map[yp-1][xp-1].room = 1;
             break;
         }
 
     }
-    printf("function moveccell done");
+  //  printf("function moveccell done");
 }
 int checkmove1( int xp , int yp , int n){
     int evalue_result;
@@ -235,7 +248,10 @@ int checkmove3(int xp, int yp , int n){
         return 7;
     }
 }
-struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , int n ){
+   // sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+
+int   checkcell(int xp , int yp , int locate , struct mapEl** map , int n ){
+    int sum=0;
     struct map_evalue result;
     if( locate == 1 ){
         //because we know where it is and where can it go...
@@ -265,7 +281,9 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[1][0].type == 3){
             result.direct1=0;
         }
-        return result;
+        ///return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+        return sum;
     }
     if( locate == 3 ){
         //because we know where it is and where can it go...
@@ -289,7 +307,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[n-2][0].type == 3){
             result.direct2 = 0;
         }
-        return result;
+        ///return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
     }
      if( locate == 6 ){
         //because we know where it is and where can it go...
@@ -320,7 +339,9 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[n-1][n-2].type == 3){
 				result.direct5 = 0;
 			}
-			return result;
+			///return result;
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
 
 		else{
@@ -344,6 +365,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[yp][xp-1].type == 3 ){
 				result.direct6 = 0;
 			}
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
 	}
     if( locate == 8 ){
@@ -369,7 +392,9 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[1][n-1].type == 3){
 				result.direct1 = 0;
 			}
-			return result;
+			///return result;
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
 		else{
 			result.direct1 = 1;
@@ -398,6 +423,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[yp][xp-1].type == 3 ){
 				result.direct6 = 0;
 			}
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
 	}
 //same thing I do for the rest
@@ -434,7 +461,9 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[yp][xp+1].type == 3 ){
             result.direct4 = 0;
         }
-        return result;
+       /// return result;
+       sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+       return sum;
     }
     if( locate == 7 ){
 
@@ -471,7 +500,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[yp][xp-1].type == 3 ){
 				result.direct4 = 0;
 			}
-			return result;
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
 
 		else{
@@ -507,6 +537,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			if( map[yp][xp-1].type == 3 ){
 				result.direct6 = 0;
 			}
+			sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+			return sum;
 		}
     }
     if( locate == 10 ){
@@ -535,7 +567,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[yp][xp-1].type == 3){
             result.direct5=0;
         }
-        return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+        return sum;
     }
     if( locate == 5 ){
         result.direct1 = 0;
@@ -563,7 +596,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[yp][xp-1].type == 3){
             result.direct6=0;
         }
-        return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+        return sum;
     }
     if( locate == 9){
         result.direct1 = 1;
@@ -603,7 +637,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[yp][xp-1].type == 3 ){
             result.direct6 = 0;
         }
-        return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+        return sum;
     }
     if( locate == 4){
         result.direct1 = 0;
@@ -643,7 +678,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         if( map[yp-1][xp-1].type == 3 ){
             result.direct6 = 0;
         }
-        return result;
+        sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+        return sum;
     }
     if( locate == 11 ){
         //what if it is at the middle with even x
@@ -692,7 +728,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
             if( map[yp][xp-1].type == 3 ){
                 result.direct6=0;
             }
-            return result;
+            sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+            return sum;
         }
         //what if it is at the middle with odd x
         else{
@@ -739,7 +776,8 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
             if( map[yp-1][xp-1].type == 3 ){
                 result.direct6=0;
             }
-            return result;
+            sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
+            return sum;
         }
     }
     exit(-3);
@@ -784,9 +822,17 @@ int energy_permission(char * namep , struct cell * head , struct mapEl **map){
 int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
     struct cell * current = head;
     struct map_evalue result;
+    int sum=0;
     for( ; current != NULL ; current = current->next ){
         if( strcmp(current->name,namep) == 0 ){
-            result=checkcell( current->x , current->y , checkmove1(current->x , current->y , n), map , n);
+           sum=checkcell( current->x , current->y , checkmove1(current->x , current->y , n), map , n);
+
+            result.direct1 = sum%10; sum-=sum%10; sum/=10;
+            result.direct2 = sum%10; sum-=sum%10; sum/=10;
+            result.direct3 = sum%10; sum-=sum%10; sum/=10;
+            result.direct4 = sum%10; sum-=sum%10; sum/=10;
+            result.direct5 = sum%10; sum-=sum%10; sum/=10;
+            result.direct6 = sum%10; sum-=sum%10; sum/=10;
             break;
         }
     }
@@ -804,15 +850,8 @@ int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
     else if( result.direct6 )
         return 6;
     else
-        exit(-4);
+        return 0;
 }
-
-
-
-
-
-
-
 struct cell * split( struct cell * head , char * namep , int direct , struct mapEl **map){
 	char * randName1 , * randName2 ;
 	struct cell * current = head ;
@@ -824,8 +863,10 @@ struct cell * split( struct cell * head , char * namep , int direct , struct map
 	randName2=rand_string();
 	int xp = current->x;
 	int yp = current->y;
+	addend( head , randName1 , xp , yp , 40 );
     head = deletecell(head , namep , current->x , current->y);
-    addend( head , randName1 , xp , yp , 40 );
+    //puts("reached");
+   // addend( head , randName1 , xp , yp , 40 );
     if( direct == 1 ){
         addend( head , randName1 , xp , yp+1 , 40 );
         map[yp+1][xp].room = 1;
