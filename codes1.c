@@ -1,6 +1,19 @@
-
-
+/*
+#include<stdio.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<windows.h>
+#include<time.h>
+#include<math.h>
+#include<string.h>
+#include <dos.h>
+#include <dir.h>
+*/
+#include"myheaders.h"
+#define size 9
+/*
 struct map_evalue{
+    //these are the directions which cell can move
     int direct1;
     int direct2;
     int direct3;
@@ -8,14 +21,36 @@ struct map_evalue{
     int direct5;
     int direct6;
 };
+struct cell{
+    char name[9];
+    int energy;
+    int x;
+    int y;
+    struct cell* next ;
+};
+struct mapEl{
+    //to know which of the 4 it is
+    int type;
+    //to know whether there is a cell in it or not
+    int room;
+};
 
+*/
+
+struct mapEl** creat_map(int n){
+    struct mapEl** map=(struct mapEl**)malloc( sizeof(struct mapEl*) * n );
+    for(int i = 0 ; i < n ; i++){
+        map[i]=(struct mapEl*)malloc( sizeof(struct mapEl) * n);
+    }
+    return map;
+}
 struct cell * creat_cellhead(char *namep, int xp , int yp , int energyp){
     struct cell * newhead = malloc( sizeof(struct cell) );
-    cell->next = NULL;
-    cell->x = xp ;
-    cell->y = yp ;
-    cell->energy = energyp;
-    strcpy(cell->name,namep);
+    newhead->next = NULL;
+    newhead->x = xp ;
+    newhead->y = yp ;
+    newhead->energy = energyp;
+    strcpy(newhead->name,namep);
     return newhead;
 }
 void addend( struct cell* head , char * newname , int xp , int yp , int energyp){
@@ -69,14 +104,7 @@ char * rand_string(void) { // reserves a place for NULL
     str[size] = '\0';
     return str;
 }
-int x_coor(int n){
-    int i = rand() % n;
-    return i;
-}
-int y_coor(int n){
-    int i = rand() % n;
-    return i;
-}
+
 void movecell(struct cell *head , int oldx , int oldy , int coor_number){
     struct cell * current = head;
     for(; current != NULL ; current = current->next){
@@ -85,29 +113,60 @@ void movecell(struct cell *head , int oldx , int oldy , int coor_number){
     }
     if( current == NULL )
         exit(-2);
-    switch(coor_number){
-    case 1 :
-        (current->y)++;
-        break;
-    case 2 :
-        (current->y)--;
-        break;
-    case 3 :
-        (current->y)++;
-        (current->x)++;
-        break;
-    case 4 :
-        (current->x)++;
-        break;
-    case 5 :
-        (current->y)++;
-        (current->x)--;
-        break;
+    if( oldx%2 == 0){
+        switch(coor_number){
+        case 1 :
+            (current->y)++;
+            break;
+        case 2 :
+            (current->y)--;
+            break;
+        case 3 :
+            (current->y)++;
+            (current->x)++;
+            break;
+        case 4 :
+            (current->x)++;
+            break;
+        case 5 :
+            (current->y)++;
+            (current->x)--;
+            break;
 
-    case 6 :
-        (current->x)--;
-        break;
+        case 6 :
+            (current->x)--;
+            break;
+        }
     }
+    else{
+        switch(coor_number){
+        case 1 :
+            (current->y)++;
+            break;
+        case 2 :
+            (current->y)--;
+            break;
+        case 3 :
+            //(current->y)++;
+            (current->x)++;
+            break;
+        case 4 :
+            (current->y)--;
+            (current->x)++;
+            break;
+        case 5 :
+            //(current->y)++;
+            (current->x)--;
+            break;
+
+        case 6 :
+            (current->y)--;
+            (current->x)--;
+            break;
+        }
+
+    }
+    printf("function moveccell done");
 }
 int checkmove1( int xp , int yp , int n){
     int evalue_result;
@@ -262,7 +321,7 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			}
 			return result;
 		}
-		
+
 		else{
 			result.direct1 = 0;
 			result.direct2 = 1;
@@ -377,7 +436,7 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
         return result;
     }
     if( locate == 7 ){
-		
+
 		if( n%2 == 0 ){
 			result.direct1 = 1;
 			result.direct2 = 1;
@@ -413,7 +472,7 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
 			}
 			return result;
 		}
-		
+
 		else{
 			result.direct1 = 1;
 			result.direct2 = 1;
@@ -684,6 +743,191 @@ struct map_evalue checkcell(int xp , int yp , int locate , struct mapEl** map , 
     }
     exit(-3);
 }
+int split_permission(char * namep , struct cell * head , struct mapEl **map){
+    struct cell * current = head ;
+    for( ;current != NULL  ; current = current->next ){
+        if( strcmp( current->name , namep ) == 0 ){
+            break;
+        }
+    }
+    if(  map[current->y][current->x].type == 2 )
+        return 1;
+    else
+        return 0;
+}
+int energy_permission(char * namep , struct cell * head , struct mapEl **map){
+    struct cell * current = head ;
+    for( ;current != NULL  ; current = current->next ){
+        if( strcmp( current->name , namep ) == 0 ){
+            break;
+        }
+    }
+     //if it is an energy place
+     if(  map[current->y][current->x].type > 4 ){
+             //if energy is more than 15
+            if(   map[current->y][current->x].type > 15  ){
+                    return 1;
+                 (map[current->y][current->x].type) -= 15;
+            }
+             //if energy is less than 15
+            else{
+                    int hold = map[current->y][current->x].type;
+                    map[current->y][current->x].type = 0;
+                    return hold;
+            }
+     }
+     //if it is not an energy place
+    else
+        return 0;
+}
+int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
+    struct cell * current = head;
+    struct map_evalue result;
+    for( ; current != NULL ; current = current->next ){
+        if( strcmp(current->name,namep) == 0 ){
+            result=checkcell( current->x , current->y , checkmove1(current->x , current->y , n), map , n);
+            break;
+        }
+    }
+    //can be changed to anything e.g making places random
+    if( result.direct1 )
+        return 1;
+    else if( result.direct2 )
+        return 2;
+    else if( result.direct3 )
+        return 3;
+    else if( result.direct4 )
+        return 4;
+    else if( result.direct5 )
+        return 5;
+    else if( result.direct6 )
+        return 6;
+    else
+        exit(-4);
+}
+
+
+
+
+
+
+
+struct cell * split( struct cell * head , char * namep , int direct){
+	char * randName1 , * randName2 ;
+	struct cell * current = head ;
+	for( ; current != NULL ; current = current->next ){
+		if( strcmp( current->name , namep ) == 0 )
+			break;
+	}
+	randName1=rand_string();
+	randName2=rand_string();
+	int xp = current->x;
+	int yp = current->y;
+    head = deletecell(head , namep , current->x , current->y);
+    addend( head , randName1 , xp , yp , 40 );
+    if( direct == 1 ){
+        addend( head , randName1 , xp , yp+1 , 40 );
+    }
+    else if( direct == 2 ){
+        addend( head , randName2 , xp , yp-1 , 40 );
+    }
+    else{
+        if( xp%2 == 0 ){
+            if( direct == 3 ){
+                addend( head , randName2 , xp+1 , yp+1 , 40 );
+            }
+            else if( direct == 4 ){
+                addend( head , randName2 , xp+1 , yp , 40 );
+            }
+            else if( direct == 5 ){
+                addend( head , randName1 , xp-1 , yp+1 , 40 );
+            }
+            else if( direct == 6 ){
+                addend( head , randName2 , xp-1 , yp , 40 );
+            }
+        }
+        else{
+            if( direct == 3 ){
+                addend( head , randName2 , xp+1 , yp , 40 );
+            }
+            else if( direct == 4 ){
+                addend( head , randName2 , xp+1 , yp-1 , 40 );
+            }
+            else if( direct == 5 ){
+                addend( head , randName2 , xp-1 , yp , 40 );
+            }
+            else if( direct == 6 ){
+                addend( head , randName2 , xp-1 , yp-1 , 40 );
+            }
+        }
+    }
+    return head;
+}
+
+
+
+void get_energy( struct cell * head , int permission , char * namep ){
+    struct cell * current = head;
+    for( ; current != NULL ; current = current ->next ){
+        if( strcmp( current->name , namep ) == 0 ){
+            break;
+        }
+    }
+    if( current == NULL )
+        exit(-5);
+    if( permission == 0 )
+        return;
+    else if( permission == 1 ){
+        (current->energy) += 15;
+        return;
+    }
+    else{
+        (current->energy) += permission;
+        return;
+    }
+}
+void randomInit(struct cell * head , struct mapEl **map , int n ){
+    struct cell * current ;
+    int holdx;
+    int holdy;
+    for( current = head ; current != NULL ; ){
+        holdx = rand()%n;
+        holdy = rand()%n;
+        if( map[holdy][holdx].type != 3 && map[holdy][holdx].room != 1 ){
+            map[holdy][holdx].room = 1;
+            current->x = holdx;
+            current->y = holdy;
+            current = current->next;
+        }
+    }
+}
+void temp_emptyMapInit(struct mapEl **map , int n){
+    int holdtype=4;
+    int i , j ;
+    for( i=0 ; i<n ; i++ ){
+        for( j=0;j<n;j++){
+            map[i][j].type=4;
+            map[i][j].room=0
+        }
+    }
+}
+
+
+
+
+
+
+/*
+DUPLICATED
+int x_coor(int n){
+    int i = rand() % n;
+    return i;
+}
+int y_coor(int n){
+    int i = rand() % n;
+    return i;
+}
+*/
 /*
 struct cell * slpit(struct cell *head , char *namep , int xp , int yp , int n){
     struct cell * current = head;
@@ -704,6 +948,33 @@ struct cell * slpit(struct cell *head , char *namep , int xp , int yp , int n){
     }
 }
 */
+/*
+int energy_permission(char * namep , struct cell * head , struct mapEl **map){
+    struct cell * current = head ;
+    for( ;current != NULL  ; current = current->next ){
+        if( strcmp( current->name , namep ) == 0 ){
+            break;
+        }
+    }
+     //if it is an energy place
+     if(  map[current->y][current->x].type > 4 ){
+             //if energy is more than 15
+            if(   map[current->y][current->x].type > 15  ){
+                    return 1;
+                 ///(map[current->y][current->x].type) -= 15;
+            }
+             //if energy is less than 15
+            else{
+                /// map[current->y][current->x].type = 0;
+                    return 2;
+            }
+     }
+     //if it is not an energy place
+    else
+        return 0;
+}
+*/
+
 
 
 
