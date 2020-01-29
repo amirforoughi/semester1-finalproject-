@@ -38,7 +38,8 @@ void SetColor(int ForgC)
 void showMap(int n2 , struct cell * head , struct mapEl** map){
     char c;
     int n = 3 * n2 +2;
-
+    int sum = score(head);
+    printf("                                                    score = %d\n", sum);
     int i = 0 , j = 0 , k = n ;
     int m= (n-2)/6 ;
 
@@ -178,6 +179,27 @@ char check_block( struct cell * head , int n , int column , int row){
     }
     return ' ';
 }
+
+
+char check_block2( struct cell * head , int n , int column , int row){
+    //SetColor(11);
+    struct cell * current = head ;
+
+    //struct cell * current2 = head ;
+    //static int j = 0;
+    int yp , xp = row-1;
+    for( yp = n-column , xp = row-1 ; current != NULL  ; current = current->next ){
+        if( current->x == xp && current->y == yp ){
+            return 'Y';
+        }
+
+    }
+    return ' ';
+}
+
+
+
+
 char check_blockX( struct mapEl **map,int n ,int  column , int row){
     static int counter4 =0;
     int yp = n - column;
@@ -292,8 +314,158 @@ void printlistname(struct cell * head){
         printf("i)%s\n",current->name);
     }
 }
+int score(struct cell * head ){
+    struct cell *current = head;
+    int sum=0;
+    for( ; current != NULL ; current = current->next){
+        //printf("%d\n",sum);
+        sum = sum + current->energy ;
+    }
+    return sum;
+}
 
 
+
+
+
+
+
+
+
+
+
+
+
+void showMap2(int n2 , struct cell * head , struct cell * head2 , struct mapEl** map){
+    char c;
+    int n = 3 * n2 +2;
+    int sum1 = score(head);
+    int sum2 = score(head2);
+    printf("                                                    score = %d\n", sum1);
+    printf("                                                    score = %d\n", sum2);
+    int i = 0 , j = 0 , k = n ;
+    int m= (n-2)/6 ;
+
+        for( i=0 ; i<n ; i++ ){
+            if ( i == 0){
+                    for(j=0;j<m;j++){
+                        printf(" _______        ");
+                    }
+
+                        printf("\n");
+                        continue;
+            }
+            if( i == 1){
+                for(j=0;j<m;j++){
+                        printf("|       |_______");
+                     }
+                     // printf("I");
+                        printf("\n");
+                        continue;
+            }
+
+            if (i == n-1){
+                printf("        |_______");
+                     for(j=0;j<m-1;j++){
+                        printf("|       |_______");
+                     }
+                      printf("|");
+                        printf("\n");
+                        continue;
+            }
+            if (i%3 == 1){
+                     char s[8] = "       ";
+                     char s2[8] = "keepout";
+                     int perr=0;
+                     //perr = function;
+                     if( perr == 1)
+                        strcpy( s , s2 );
+                     for(j=0;j<m;j++){
+                        printf("|%s|_______", s);
+                     }
+                      printf("|");
+                        printf("\n");
+            }
+            if (i%3 == 2){
+                     for(j=0;j<m;j++){
+                        c=check_block(head , (n-2)/3 , (i+1)/3 , 2*j+1);
+                        if( c != 'X'){
+                            c = check_block2(head2,(n-2)/3 , (i+1)/3 , 2*j+1);
+                            if( c != 'Y')
+                                c=' ';
+                        }
+                        char X= check_blockX(map,(n-2)/3,(i+1)/3,2*j+1);
+                        char Y;
+                        char Z;
+                        if( X == 'B'){
+                            X=' ';Y=' ';Z=' ';
+                        }
+                        else if( X == 'c'){
+                            X=' '; Y=5; Z=' ';
+                        }
+                        else if( X == 'b'){
+                            X = 3505; Y=3505; Z =3505;
+                        }
+                        else if( X == 'A'){
+                            X='0';Y=' ';Z=' ';
+                        }
+                        else{
+                            Y= check_blockX(map,(n-2)/3,(i+1)/3,2*j+1);
+                            if ( Y == '0'){
+                                Z = '1';
+                            }
+                            else{
+                                Z = ' ';
+                            }
+
+                        }
+                        printf("|  %c %c%c%c|       ",c,Z,Y,X);
+
+                     }
+                      printf("|");
+                        printf("\n");
+            }
+            if (i%3 == 0){
+                     for(j=0;j<m;j++){
+                        c=check_block(head ,  (n-2)/3  , (i+2)/3 , 2*j+2);
+                        if( c != 'X'){
+                            c = check_block2(head2,(n-2)/3 , (i+2)/3 , 2*j+2);
+                            if( c != 'Y')
+                                c=' ';
+                        }
+                        char X= check_blockX(map,(n-2)/3,(i+2)/3,2*j+2);
+                        char Y;
+                        char Z;
+                        if( X == 'B'){
+                            X= ' '; Y=' '; Z=' ';
+                        }
+                        else if( X == 'c'){
+                            X=' '; Y=5; Z=' ';
+                        }
+                        else if( X == 'b'){
+                            X = 3505; Y=3505; Z =3505;
+                        }
+                        else if( X == 'A'){
+                            X='0';Y=' ';Z=' ';
+                        }
+                        else{
+                            Y= check_blockX(map,(n-2)/3,(i+2)/3,2*j+2);
+                            if ( Y == '0'){
+                                Z = '1';
+                            }
+                            else{
+                                Z = ' ';
+                            }
+
+                        }
+
+                        printf("|_______|  %c %c%c%c",c,Z,Y,X);
+                     }
+                      printf("|");
+                        printf("\n");
+            }
+        }
+}
 
 
 /*

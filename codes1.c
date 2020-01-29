@@ -275,7 +275,7 @@ int checkmove3(int xp, int yp , int n){
 }
    // sum=result.direct1+result.direct2*10+result.direct3*100+result.direct4*1000+result.direct5*10000+result.direct6*100000;
 
-int   checkcell(int xp , int yp , int locate , struct mapEl** map , int n ){
+int checkcell(int xp , int yp , int locate , struct mapEl** map , int n ){
     int sum=0;
     struct map_evalue result;
     if( locate == 1 ){
@@ -814,7 +814,7 @@ int split_permission(char * namep , struct cell * head , struct mapEl **map){
             break;
         }
     }
-    if(  map[current->y][current->x].type == 2 && current->energy > 80){
+    if(  map[current->y][current->x].type == 2 && current->energy >= 80){
         return 1;
     }
     else
@@ -822,16 +822,21 @@ int split_permission(char * namep , struct cell * head , struct mapEl **map){
 }
 int energy_permission(char * namep , struct cell * head , struct mapEl **map){
     struct cell * current = head ;
-    for( ;current != NULL  ; current = current->next ){
+    for( ; current != NULL  ; current = current->next ){
         if( strcmp( current->name , namep ) == 0 ){
             break;
         }
+    }
+    if( current == NULL){
+        exit(-8);
     }
      //if it is an energy place
      if(  map[current->y][current->x].type > 4 ){
              //if energy is more than 15
             if(   map[current->y][current->x].type > 15  ){
+                 //puts("here4");
                  (map[current->y][current->x].type) -= 15;
+                 //puts("here3");
                     return 1;
             }
              //if energy is less than 15
@@ -842,8 +847,10 @@ int energy_permission(char * namep , struct cell * head , struct mapEl **map){
             }
      }
      //if it is not an energy place
-    else
+    else{
         return 0;
+    }
+    exit(-9);
 }
 int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
     struct cell * current = head;
@@ -896,6 +903,7 @@ void split( struct cell * head , char * namep , int direct , struct mapEl **map)
 	int xp = current->x;
 	int yp = current->y;
 	strcpy(current->name , randName1 );
+	current->energy = 40;
 	//addend( head , randName1 , xp , yp , 40 );
     //head = deletecell(head , namep , current->x , current->y);
     //puts("reached");
@@ -946,7 +954,8 @@ void split( struct cell * head , char * namep , int direct , struct mapEl **map)
             }
         }
     }
-    return head;
+    return;
+    //return head;
 }
 
 
@@ -1026,7 +1035,41 @@ void Mapinit(char * buff , int n , struct mapEl **map){
         }
     }
 }
+int checkenergy(struct cell * head , struct mapEl **map ){
+    struct cell * current = head ;
+    for( ; current != NULL ;  current = current->next ){
+        if( map[current->y][current->x].type > 4 ){
+            return 1;
+        }
+    }
+    return 0;
+}
 
+int energy_permission2(char * namep , struct cell * head , struct mapEl **map){
+    struct cell * current = head ;
+    for( ;current != NULL  ; current = current->next ){
+        if( strcmp( current->name , namep ) == 0 ){
+            break;
+        }
+    }
+     //if it is an energy place
+     if(  map[current->y][current->x].type > 4 ){
+             //if energy is more than 15
+            if(   map[current->y][current->x].type > 15  ){
+                 //(map[current->y][current->x].type) -= 15;
+                    return 1;
+            }
+             //if energy is less than 15
+            else{
+                    int hold = map[current->y][current->x].type;
+                    //map[current->y][current->x].type = 0;
+                    return hold;
+            }
+     }
+     //if it is not an energy place
+    else
+        return 0;
+}
 /*
 char * rand_number(void){
 

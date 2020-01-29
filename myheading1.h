@@ -34,7 +34,8 @@ struct mapEl{
 void addend( struct cell* head , char * newname , int xp , int yp , int energyp );
 struct cell* deletecell( struct cell * head , char * namep , int xp, int yp );
 struct cell * creatcell(char *namep, int xp , int yp);
-char *rand_string(void);
+char *rand_string1(void);
+char *rand_string2(void);
 struct mapEl** creat_map(int n);
 int energy_permission(char * name , struct cell * head , struct mapEl** map);
 void SetColor(int ForgC);
@@ -44,6 +45,7 @@ void showMap(int n2 , struct cell * head , struct mapEl** map);
 char * rand_string2(void);
 char * rand_string1(void);
 char check_blockX( struct mapEl **map,int n ,int  column , int row);
+int energy_permission2(char * namep , struct cell * head , struct mapEl **map);
 /*
 int x_coor(int n);
 int y_coor(int n);
