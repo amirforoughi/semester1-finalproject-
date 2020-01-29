@@ -38,16 +38,7 @@ void SetColor(int ForgC)
 void showMap(int n2 , struct cell * head , struct mapEl** map){
     char c;
     int n = 3 * n2 +2;
-    /*
-    if( n2 == 3)
-        n = 11;
-    if( n2 == 4)
-        n = 14;
-    if( n2 == 2)
-        n = 8;
-    if( n2 == 8)
-        n = 26;
-    */
+
     int i = 0 , j = 0 , k = n ;
     int m= (n-2)/6 ;
 
@@ -79,8 +70,14 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
                         continue;
             }
             if (i%3 == 1){
+                     char s[8] = "       ";
+                     char s2[8] = "keepout";
+                     int perr=0;
+                     //perr = function;
+                     if( perr == 1)
+                        strcpy( s , s2 );
                      for(j=0;j<m;j++){
-                        printf("|       |_______");
+                        printf("|%s|_______", s);
                      }
                       printf("|");
                         printf("\n");
@@ -88,7 +85,32 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
             if (i%3 == 2){
                      for(j=0;j<m;j++){
                         c=check_block(head , (n-2)/3 , (i+1)/3 , 2*j+1);
-                        printf("|  %c   0|       ",c);
+                        char X= check_blockX(map,(n-2)/3,(i+1)/3,2*j+1);
+                        char Y;
+                        char Z;
+                        if( X == 'B'){
+                            X=' ';Y=' ';Z=' ';
+                        }
+                        else if( X == 'c'){
+                            X=' '; Y=5; Z=' ';
+                        }
+                        else if( X == 'b'){
+                            X = 3505; Y=3505; Z =3505;
+                        }
+                        else if( X == 'A'){
+                            X='0';Y=' ';Z=' ';
+                        }
+                        else{
+                            Y= check_blockX(map,(n-2)/3,(i+1)/3,2*j+1);
+                            if ( Y == '0'){
+                                Z = '1';
+                            }
+                            else{
+                                Z = ' ';
+                            }
+
+                        }
+                        printf("|  %c %c%c%c|       ",c,Z,Y,X);
 
                      }
                       printf("|");
@@ -97,7 +119,34 @@ void showMap(int n2 , struct cell * head , struct mapEl** map){
             if (i%3 == 0){
                      for(j=0;j<m;j++){
                         c=check_block(head ,  (n-2)/3  , (i+2)/3 , 2*j+2);
-                        printf("|_______|  %c   0",c);
+
+                        char X= check_blockX(map,(n-2)/3,(i+2)/3,2*j+2);
+                        char Y;
+                        char Z;
+                        if( X == 'B'){
+                            X= ' '; Y=' '; Z=' ';
+                        }
+                        else if( X == 'c'){
+                            X=' '; Y=5; Z=' ';
+                        }
+                        else if( X == 'b'){
+                            X = 3505; Y=3505; Z =3505;
+                        }
+                        else if( X == 'A'){
+                            X='0';Y=' ';Z=' ';
+                        }
+                        else{
+                            Y= check_blockX(map,(n-2)/3,(i+2)/3,2*j+2);
+                            if ( Y == '0'){
+                                Z = '1';
+                            }
+                            else{
+                                Z = ' ';
+                            }
+
+                        }
+
+                        printf("|_______|  %c %c%c%c",c,Z,Y,X);
                      }
                       printf("|");
                         printf("\n");
@@ -129,9 +178,55 @@ char check_block( struct cell * head , int n , int column , int row){
     }
     return ' ';
 }
+char check_blockX( struct mapEl **map,int n ,int  column , int row){
+    static int counter4 =0;
+    int yp = n - column;
+    int xp = row - 1;
+    if(counter4 == 0){
+        if( map[yp][xp].type >4 ){
+           int i = (map[yp][xp].type)%10 ;
+           char c = i + '0';
+           //printf("%c",c);
+           counter4++;
+           return c;
+        }
+        else if( map[yp][xp].type == 0 ){
+            counter4 = 0;
+            return 'A';
+        }
+        else{
+            counter4 = 0;
+            if( map[yp][xp].type == 3){
+                return 'b';
+            }
+            if( map[yp][xp].type == 2){
+                return 'c';
+            }
+            return 'B';
+        }
+    }
+
+
+   else if( counter4 == 1 ){
+
+            int i = ( ( map[yp][xp].type - (  (map[yp][xp].type)%10) )/10 ) %10;
+            if( i == 0 ){
+                counter4 = 0;
+                return '0';
+            }
+            counter4 = 0;
+            char c = i + '0';
+            return c;
+
+    }
+    //else
+        //exit(-7);
+}
+
+
+
 
 void show_mainmenu(void){
-
     SetColor(12);
     printf("[1]Load\n");
     SetColor(5);
@@ -141,5 +236,73 @@ void show_mainmenu(void){
     SetColor(4);
     printf("[4]Exit\n");
 }
+void show_moveoptions(int dir1 , int dir2 , int dir3 , int dir4 , int dir5 , int dir6 ){
+    if( dir1 == 1 ){
+        SetColor(14);
+        puts("[1]North");
+    }
+    else{
+        SetColor(8);
+        puts("[1]North");
+    }
+    if( dir2 == 1 ){
+        SetColor(14);
+        puts("[2]South");
+    }
+    else{
+        SetColor(8);
+        puts("[2]South");
+    }
+    if( dir3 == 1 ){
+        SetColor(14);
+        puts("[3]NorthEast");
+    }
+    else{
+        SetColor(8);
+        puts("[3]NorthEast");
+    }
+    if( dir4 == 1 ){
+        SetColor(14);
+        puts("[4]SouthEast");
+    }
+    else{
+        SetColor(8);
+        puts("[4]SouthEast");
+    }
+    if( dir5 == 1 ){
+        SetColor(14);
+        puts("[5]NorthWest");
+    }
+    else{
+        SetColor(8);
+        puts("[5]NorthWest");
+    }
+    if( dir6 == 1 ){
+        SetColor(14);
+        puts("[6]SouthWest");
+    }
+    else{
+        SetColor(8);
+        puts("[6]SouthWest");
+    }
+}
+void printlistname(struct cell * head){
+    struct cell * current =head;
+    for(int i=0 ; current!=NULL ; current = current->next , i++){
+        printf("i)%s\n",current->name);
+    }
+}
 
 
+
+
+/*
+    if( n2 == 3)
+        n = 11;
+    if( n2 == 4)
+        n = 14;
+    if( n2 == 2)
+        n = 8;
+    if( n2 == 8)
+        n = 26;
+    */

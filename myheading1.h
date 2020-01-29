@@ -8,6 +8,7 @@
 #include <dos.h>
 #include <dir.h>
 #define size 4
+//int counter5 =1;
 struct map_evalue{
     //these are the directions which cell can move
     int direct1;
@@ -40,6 +41,9 @@ void SetColor(int ForgC);
 void randomInit(struct cell * head , struct mapEl **map , int n );
 char check_block( struct cell * head , int n , int column , int row);
 void showMap(int n2 , struct cell * head , struct mapEl** map);
+char * rand_string2(void);
+char * rand_string1(void);
+char check_blockX( struct mapEl **map,int n ,int  column , int row);
 /*
 int x_coor(int n);
 int y_coor(int n);

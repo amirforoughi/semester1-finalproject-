@@ -9,6 +9,7 @@
 #include <dos.h>
 #include <dir.h>
 */
+#include<time.h>
 #include"myheaders.h"
 #define size 4
 /*
@@ -64,7 +65,9 @@ void addend( struct cell* head , char * newname , int xp , int yp , int energyp)
     newcell->y = yp;
     newcell->energy = energyp;
     struct cell * current = head ;
-    for( ; current->next != NULL ; current = current->next );
+    for( ; current->next != NULL ;  ){
+        current = current->next;
+    }
     current->next = newcell ;
     return ;
 }
@@ -94,17 +97,39 @@ struct cell* deletecell(struct cell * head , char * namep , int xp, int yp){
         exit(-1);
     }
 }
-char * rand_string(void) { // reserves a place for NULL
+char * rand_string1(void) {
+    static int differ = 1;// reserves a place for NULL
     srand(time(0));
+   // printf("1-%d",rand());
     char *str = malloc( (size+1) * sizeof(char) );
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for ( size_t i = 0 ; i < size ; i++ ) {
-        int key = rand() % (sizeof(charset) / sizeof(char) - 1);
+    //printf("%s",str);
+    const char charset[52] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for ( int  i = 0 ; i < size ; i++ ) {
+        int key = (rand()*differ-2) % (sizeof(charset) / sizeof(char) - 1);
         str[i] = charset[key];
     }
+    differ++;
+    //printf("%s",str);
     str[size] = '\0';
     return str;
 }
+
+
+char * rand_string2(void) { // reserves a place for NULL
+    srand(time(0));
+    //printf("2-%d",rand());
+    char *sbr = malloc( (size+1) * sizeof(char) );
+    //printf("%s",str);
+    const char charset[52] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for ( int  i = 0 ; i < size ; i++ ) {
+        int key = (rand()*5/8+2) % (sizeof(charset) / sizeof(char) - 1);
+        sbr[i] = charset[key];
+    }
+    //printf("%s",str);
+    sbr[size] = '\0';
+    return sbr;
+}
+
 
 void movecell(struct cell *head , int xp , int yp , int coor_number , struct mapEl **map){
     struct cell * current = head;
@@ -789,8 +814,9 @@ int split_permission(char * namep , struct cell * head , struct mapEl **map){
             break;
         }
     }
-    if(  map[current->y][current->x].type == 2 )
+    if(  map[current->y][current->x].type == 2 && current->energy > 80){
         return 1;
+    }
     else
         return 0;
 }
@@ -852,23 +878,30 @@ int  checksplit(struct cell * head , char * namep , int n , struct mapEl** map){
     else
         return 0;
 }
-struct cell * split( struct cell * head , char * namep , int direct , struct mapEl **map){
+void split( struct cell * head , char * namep , int direct , struct mapEl **map){
 	char * randName1 , * randName2 ;
+	srand(time(0));
+	randName1=rand_string1();
 	struct cell * current = head ;
 	for( ; current != NULL ; current = current->next ){
 		if( strcmp( current->name , namep ) == 0 )
 			break;
 	}
-	randName1=rand_string();
-	randName2=rand_string();
+
+	randName2=rand_string2();
+	//printf("%s",randName1);
+	//printf("%s",randName2);
+	//printf("random-> %d",rand());
+	//printf("random-> %d",rand());
 	int xp = current->x;
 	int yp = current->y;
-	addend( head , randName1 , xp , yp , 40 );
-    head = deletecell(head , namep , current->x , current->y);
+	strcpy(current->name , randName1 );
+	//addend( head , randName1 , xp , yp , 40 );
+    //head = deletecell(head , namep , current->x , current->y);
     //puts("reached");
    // addend( head , randName1 , xp , yp , 40 );
     if( direct == 1 ){
-        addend( head , randName1 , xp , yp+1 , 40 );
+        addend( head , randName2 , xp , yp+1 , 40 );
         map[yp+1][xp].room = 1;
     }
     else if( direct == 2 ){
@@ -886,7 +919,7 @@ struct cell * split( struct cell * head , char * namep , int direct , struct map
                 map[yp][xp+1].room = 1;
             }
             else if( direct == 5 ){
-                addend( head , randName1 , xp-1 , yp+1 , 40 );
+                addend( head , randName2 , xp-1 , yp+1 , 40 );
                 map[yp+1][xp-1].room = 1;
             }
             else if( direct == 6 ){
@@ -967,7 +1000,7 @@ void temp_addend( struct cell * head ){
     struct cell * current = head;
     for(int  i=0 ; i<3 ; current = current->next , i++){
         if( current->next == NULL ){
-            char * rndname=rand_string();
+            char * rndname=rand_string1();
             current->next = malloc( sizeof( struct cell ) );
             current = current->next ;
             current->next = NULL;
@@ -994,8 +1027,11 @@ void Mapinit(char * buff , int n , struct mapEl **map){
     }
 }
 
+/*
+char * rand_number(void){
 
-
+}
+*/
 
 
 /*
