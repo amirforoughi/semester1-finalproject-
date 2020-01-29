@@ -235,6 +235,7 @@ int main()
     }
         return 0;
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if( laterlateinput == 3){
 
     int n=3,xp1,yp1,xp2,yp2;
@@ -264,15 +265,20 @@ int main()
     struct cell * head1 = creat_cellhead(rndname1,xp1,yp1,0);
     struct cell * head2 = creat_cellhead(rndname2,xp2,yp2,0);
     showMap2(n,head1,head2,map);
+    updateMap(head1,head2,map,n);
     static int turn;
+    int laterinput = 0;
+    while(laterinput != 5){
     if( turn%2 == 0 ){
+        puts("ready player1...");
+
         int xp=xp1;
         int yp=yp1;
         struct cell * head = head1;
         int spltpermission;
         int spltcheck , source , engypermission;
         struct cell * current2 = head;
-        while(laterinput != 5){
+        //while(laterinput != 5){
             int count2=0 , count3=0;
             for( current2 = head ; current2 != NULL ; current2 = current2->next , count2++ ){
                 spltpermission=split_permission( current2->name , head , map );
@@ -325,6 +331,7 @@ int main()
                 }
                 split(head , current->name , spltcheck , map);
                 SetColor(15);
+                updateMap(head1,head2,map,n);
                 showMap2(n,head,head2,map);
 
             }
@@ -369,11 +376,13 @@ int main()
                 result.direct5 = sum%10; sum-=sum%10; sum/=10;
                 result.direct6 = sum%10; sum-=sum%10; sum/=10;
                 printf("which direction\n");
+                int input;
                 SetColor(14);
                 show_moveoptions(result.direct1 , result.direct2 , result.direct3 , result.direct4 , result.direct5 , result.direct6);
                 scanf("%d",&input);
                 movecell(head , current->x , current->y , input , map);
                 SetColor(15);
+                updateMap(head1,head2,map,n);
                 showMap2(n,head,head2,map);
                 //printf("Hello world!\n");
                 SetColor(3);
@@ -408,22 +417,25 @@ int main()
                 //puts("here2");
                 get_energy(head,permission,current->name);
                 SetColor(15);
+                updateMap(head1,head2,map,n);
                 showMap2(n,head,head2,map);
             }
 
 
 
-        }
+
          turn++;
     }
     else{
-       int xp=xp1;
-        int yp=yp1;
-        struct cell * head = head1;
+        puts("ready player2...");
+        //int laterinput = 0;
+        int xp=xp2;
+        int yp=yp2;
+        struct cell * head = head2;
         int spltpermission;
         int spltcheck , source , engypermission;
         struct cell * current2 = head;
-        while(laterinput != 5){
+        //while(laterinput != 5){
             int count2=0 , count3=0;
             for( current2 = head ; current2 != NULL ; current2 = current2->next , count2++ ){
                 spltpermission=split_permission( current2->name , head , map );
@@ -465,7 +477,8 @@ int main()
                 }
                 counter5 = 1;
                 SetColor(15);
-                showMap2(n,head,head2,map);
+                updateMap(head1,head2,map,n);
+                showMap2(n,head1,head,map);
                 int number;
                 scanf( "%d", &number );
                 struct cell * current = head;
@@ -476,7 +489,8 @@ int main()
                 }
                 split(head , current->name , spltcheck , map);
                 SetColor(15);
-                showMap2(n,head,head2,map);
+                updateMap(head1,head2,map,n);
+                showMap2(n,head1,head,map);
 
             }
             if( laterinput == 2){
@@ -521,11 +535,13 @@ int main()
                 result.direct6 = sum%10; sum-=sum%10; sum/=10;
                 printf("which direction\n");
                 SetColor(14);
+                int input;
                 show_moveoptions(result.direct1 , result.direct2 , result.direct3 , result.direct4 , result.direct5 , result.direct6);
                 scanf("%d",&input);
                 movecell(head , current->x , current->y , input , map);
+                updateMap(head1,head2,map,n);
                 SetColor(15);
-                showMap2(n,head,head2,map);
+                showMap2(n,head1,head,map);
                 //printf("Hello world!\n");
                 SetColor(3);
                 fclose(fpb1);
@@ -558,15 +574,17 @@ int main()
                 permission = energy_permission(current->name,head,map);
                 //puts("here2");
                 get_energy(head,permission,current->name);
+                updateMap(head1,head2,map,n);
                 SetColor(15);
-                showMap2(n,head,head2,map);
+                showMap2(n,head1,head,map);
             }
-
-
-
-        }
          turn++;
     }
+    }
+}
+if(laterlateinput == 4){
+    return 0;
+}
 }
 /*
     if( result.direct1 )
