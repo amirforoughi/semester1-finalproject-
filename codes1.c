@@ -1070,6 +1070,16 @@ int energy_permission2(char * namep , struct cell * head , struct mapEl **map){
     else
         return 0;
 }
+//must find a better name for this
+int cellBlocks(struct cell * head , struct mapEl **map , int xp , int yp ){
+    struct cell * current = head;
+    for( ; current != NULL  ; current = current->next ){
+        if( current->x == xp && current->y == yp ){
+            return 1;
+        }
+    }
+    return 0;
+}
 /*
 char * rand_number(void){
 

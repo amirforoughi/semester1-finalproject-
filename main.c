@@ -28,14 +28,29 @@ int main()
     srand(time(0));
     show_mainmenu();
     int laterlateinput;
+    int loadNumber = 0;
     scanf("%d",&laterlateinput);
-    if(laterlateinput == 2){
+    if(laterlateinput == 1){
+        Beep(1000,50); // 523 hertz (C5) for 500 milliseconds
+        SetColor(14);//make yellow
+        puts("which type would you want to load?\n[1]single player\n[2]multiplayer");
+        scanf("%d",&loadNumber);
+        SetColor(15);//make white
+        if(loadNumber == 1){
+            laterlateinput=2;
+        }
+        else{
+            laterlateinput=3;
+        }
+    }
+    if(laterlateinput == 2){//////////
     int n=3,xp,yp;
     FILE *fpb1;
     fpb1 = fopen("test2.bin","rb");//*
     if(fpb1 == NULL)
         exit(8);
     fread(&n , sizeof(n) , 1 , fpb1);
+    n=3;///
     char *buff = malloc( n*n );
     fread( buff , n*n , 1 , fpb1);
     struct mapEl **map = creat_map(n);
@@ -48,9 +63,46 @@ int main()
             i=1;
     }
     struct cell * head = creat_cellhead(rndname1,xp,yp,0);//*
+    if( loadNumber == 1){
+        FILE *fp1 ,*fp2 , *fpb1;
+        //i ll  be back
+        fpb1 = fopen("testmap.bin","rb");
+        fp2 = fopen("testmap.txt","r");
+        fp1 = fopen("testcell.txt","r");
+        fread(&n,sizeof(n),1,fp2);
+        n=3;///
+        int * info_bin;
+        info_bin = mapinfo_bin("testmap.bin");
+        n = info_bin[0];
+        n=3;///
+        mapinfo_txt("testmap.txt",info_bin);//can  return a pointer to make the extra complete
+        MapinitFILE(map,n,info_bin);
+        int lines=0;
+        char namep[5];
+        int xp , yp , energyp;
+        fscanf(fp1,"%d\n",&lines);
+        fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+        strcpy(head->name,namep);
+        head->energy = energyp;
+        head->x = xp ;
+        head->y = yp ;
+        head->next = NULL;
+        for(int  counter=1 ; counter < lines ; counter++){
+            fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+            linker(head,namep,xp,yp,energyp);
+        }
+        fclose(fp1);
+        fclose(fpb1);
+        fclose(fp2);
+        //fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
+
+    }
    // printf("%d\n",head->energy);
     SetColor(15);
-    showMap(n,head,map);
+    if( n%2 == 0)
+        showMap(n,head,map);
+    else
+        showMapodd(n,head,map);
     SetColor(13);
     //show_mainmenu();
     int input=0 ;
@@ -101,7 +153,10 @@ int main()
            }
            counter5 = 1;
            SetColor(15);
-           showMap(n,head,map);
+           if( n%2 == 0)
+                showMap(n,head,map);
+           else
+                showMapodd(n,head,map);
            int number;
            scanf( "%d", &number );
            struct cell * current = head;
@@ -112,7 +167,10 @@ int main()
            }
            split(head , current->name , spltcheck , map);
            SetColor(15);
-           showMap(n,head,map);
+           if( n%2 == 0)
+                showMap(n,head,map);
+           else
+                showMapodd(n,head,map);
 
        }
        if( laterinput == 2){
@@ -161,7 +219,10 @@ int main()
             scanf("%d",&input);
             movecell(head , current->x , current->y , input , map);
             SetColor(15);
-            showMap(n,head,map);
+            if( n%2 == 0)
+                showMap(n,head,map);
+            else
+                showMapodd(n,head,map);
             //printf("Hello world!\n");
             SetColor(3);
             fclose(fpb1);
@@ -189,25 +250,27 @@ int main()
             while( count4 < inputE ){
               current = current->next;
               count4++;
-           }
-           //puts("here");
-           permission = energy_permission(current->name,head,map);
+            }
+            //puts("here");
+            permission = energy_permission(current->name,head,map);
             //puts("here2");
             get_energy(head,permission,current->name);
             SetColor(15);
-            showMap(n,head,map);
+            if( n%2 == 0)
+                showMap(n,head,map);
+            else
+                showMapodd(n,head,map);
        }
 
 
        if( laterinput == 4 ){
-            FILE *fp1 , *fp2;
-            //, *fpb2
+            FILE *fp1 , *fp2 , *fpb1;
             int lines=0;
+            fpb1 = fopen("testmap.bin","wb");
             fp1 = fopen("testcell.txt","w");
             fp2 = fopen("testmap.txt","w");
             struct cell * current = head ;
             while( current != NULL ){
-                //fprintf(fp1,"",)
                 lines++;
                 current = current->next;
             }
@@ -215,10 +278,20 @@ int main()
             for( current = head ; current != NULL ; current = current->next ){
                 fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
             }
+            fwrite(&n,sizeof(n),1,fpb1);
             for( int i=0 ; i<n ; i++ ){
                 for( int j=0 ; j<n ; j++ ){
                     int k = map[i][j].type;
                     int k2;
+                    int k1=0;
+                    if(map[i][j].room == 1)
+                        k1=1;
+                    else
+                        k1=0;
+                    fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                    fwrite(&i,sizeof(i),1,fpb1);
+                    fwrite(&j,sizeof(j),1,fpb1);
+                    fwrite(&k1,sizeof(k1),1,fpb1);
                     if( map[i][j].type == 0 || map[i][j].type >4 ){
                         k=1;
                         k2=map[i][j].type;
@@ -231,13 +304,14 @@ int main()
             }
             fclose(fp1);
             fclose(fp2);
+            fclose(fpb1);
        }
     }
         return 0;
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if( laterlateinput == 3){
-
+    static int turn;
     int n=3,xp1,yp1,xp2,yp2;
     FILE *fpb1;
     fpb1 = fopen("test2.bin","rb");//*
@@ -264,9 +338,64 @@ int main()
     }
     struct cell * head1 = creat_cellhead(rndname1,xp1,yp1,0);
     struct cell * head2 = creat_cellhead(rndname2,xp2,yp2,0);
+
+    if( loadNumber == 2 ){
+
+
+        FILE *fp1 , *fp2 , *fpb1;
+        fp1 = fopen("multiplayer_players.txt","r");
+        fp2 = fopen("multiplayer_map.txt","r");
+        fpb1 = fopen("multiplayer_map.bin","rb");
+        int * info_bin;
+        int * info_txt;
+        info_bin = mapinfo_bin("multiplayer_map.bin");
+        for(int i=1;i<=n*n+1;i+=4)
+            printf("%d %d %d %d\n",info_bin[i],info_bin[i+1],info_bin[i+2],info_bin[i+3]);
+        mapinfo_txt("multiplayer_map.txt" , info_bin );
+        n = info_bin[0];
+        MapinitFILE(map,n,info_bin);
+        fclose(fp2);
+        fclose(fpb1);
+
+        int p1Lines=0;
+        int p2Lines=0;
+        int resumeturn=0;
+        fscanf(fp1,"%d\n",&resumeturn);
+        if( resumeturn == 1 )
+            turn=0;
+        else if( resumeturn == 2 )
+            turn=1;
+        else
+            exit(10);
+        char namep[5];
+        int energyp , xp , yp;
+        fscanf(fp1,"%d\n",&p1Lines);
+        fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+        strcpy(head1->name , namep);
+        head1->energy = energyp;
+        head1->x = xp;
+        head1->y = yp;
+        head1->next = NULL;
+        for(int counter=1;counter<p1Lines;counter++){
+            fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+            linker(head1,namep,xp,yp,energyp);
+        }
+        fscanf(fp1,"%d\n",&p2Lines);
+        fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+        strcpy(head2->name , namep);
+        head2->energy = energyp;
+        head2->x = xp;
+        head2->y = yp;
+        head2->next = NULL;
+        for(int counter=1;counter<p2Lines;counter++){
+            fscanf(fp1,"%s %d %d %d\n",namep,&xp,&yp,&energyp);
+            linker(head2,namep,xp,yp,energyp);
+        }
+        fclose(fp1);
+    }
+
     showMap2(n,head1,head2,map);
     updateMap(head1,head2,map,n);
-    static int turn;
     int laterinput = 0;
     while(laterinput != 5){
     if( turn%2 == 0 ){
@@ -422,8 +551,103 @@ int main()
             }
 
 
+            if( laterinput == 4 ){
+                FILE *fp1 , *fp2 ;
+                fp1 = fopen("multiplayer_players.txt","w");
+                fp2 = fopen("multiplayer_map.txt","w");
+                fpb1 = fopen("multiplayer_map.bin","wb");
+                struct cell * current = head1;
+                int lines =0;
+                while( current != NULL ){
+                //fprintf(fp1,"",)
+                lines++;
+                current = current->next;
+                }
+                fprintf(fp1,"%d\n",1);
+                fprintf(fp1,"%d\n",lines);
+                for( current = head1 ; current != NULL ; current = current->next ){
+                    fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
+                }
+                lines =0;
+                current = head2;
+                while( current != NULL ){
+                //fprintf(fp1,"",)
+                lines++;
+                current = current->next;
+                }
+                fprintf(fp1,"%d\n",lines);
+                for( current = head2 ; current != NULL ; current = current->next ){
+                    fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
+                }
+                fwrite(&n,sizeof(n),1,fpb1);//first write n
+                current = head1;
+                for(  int i=0 ; i<n ; i++ ){
+                    for( int j=0 ; j<n ; j++ ){
+                      if( map[i][j].room == 1){
+                        int k1 = cellBlocks(head1,map,j,i);
+                        if( k1 == 0 ){
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+                            k1=2;
 
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(k1),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                        }
+                        else{
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+                            k1=1;
 
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(k1),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                        }
+                      }
+                      else{
+                            int k1 = 0;
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(k1),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                      }
+                    }
+                }
+
+                fclose(fp1);
+                fclose(fp2);
+                fclose(fpb1);
+            }
+         checkendofgame(map,n);
          turn++;
     }
     else{
@@ -578,6 +802,104 @@ int main()
                 SetColor(15);
                 showMap2(n,head1,head,map);
             }
+
+            if( laterinput == 4 ){
+                FILE *fp1 , *fp2 ;
+                fp1 = fopen("multiplayer_players.txt","w");
+                fp2 = fopen("multiplayer_map.txt","w");
+                fpb1 = fopen("multiplayer_map.bin","wb");
+                struct cell * current = head1;
+                int lines =0;
+                while( current != NULL ){
+                //fprintf(fp1,"",)
+                lines++;
+                current = current->next;
+                }
+                fprintf(fp1,"%d\n",2);
+                fprintf(fp1,"%d\n",lines);
+                for( current = head1 ; current != NULL ; current = current->next ){
+                    fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
+                }
+                lines =0;
+                current = head2;
+                while( current != NULL ){
+                //fprintf(fp1,"",)
+                lines++;
+                current = current->next;
+                }
+                fprintf(fp1,"%d\n",lines);
+                for( current = head2 ; current != NULL ; current = current->next ){
+                    fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
+                }
+                fwrite(&n,sizeof(n),1,fpb1);
+                current = head1;
+                for(  int i=0 ; i<n ; i++ ){
+                    for( int j=0 ; j<n ; j++ ){
+                      if( map[i][j].room == 1){
+                        int k1 = cellBlocks(head1,map,j,i);
+                        if( k1 == 0 ){
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+                            k1=2;
+
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(j),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                        }
+                        else{
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+                            k1=1;
+
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(j),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                        }
+                      }
+                      else{
+                            int k1 = 0;
+                            int k = map[i][j].type;
+                            int k2;
+                            if( map[i][j].type == 0 || map[i][j].type >4 ){
+                                k=1;
+                                k2=map[i][j].type;
+                            }
+                            else{
+                                k2=0;
+                            }
+
+                            fwrite(&(map[i][j].type),sizeof(k1),1,fpb1);
+                            fwrite(&i,sizeof(i),1,fpb1);
+                            fwrite(&j,sizeof(j),1,fpb1);
+                            fwrite(&k1,sizeof(k1),1,fpb1);
+                            fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                      }
+                    }
+                }
+
+                fclose(fp1);
+                fclose(fp2);
+                fclose(fpb1);
+            }
+            checkendofgame(map,n);
          turn++;
     }
     }
@@ -585,6 +907,23 @@ int main()
 if(laterlateinput == 4){
     return 0;
 }
+/*
+if( laterlateinput == 1 ){
+    FILE *fp1 , *fp2 , *fpb1;
+    fp1 = fopen("multiplayer_players.txt","w");
+    fp2 = fopen("multiplayer_map.txt","w");
+    fpb1 = fopen("multiplayer_map.bin","wb");
+    int * info_bin;
+    int * info_txt;
+    info_bin = mapinfo_bin("multiplayer_map.bin");
+   // info_txt = mapinfo_txt("multiplayer_map.txt" , info_bin );
+    n = info_bin[0];
+    MapinitFILE(map,n,info_bin);
+    //char  namep[];
+
+}
+
+*/
 }
 /*
     if( result.direct1 )
