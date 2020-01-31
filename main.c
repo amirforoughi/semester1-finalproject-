@@ -50,32 +50,35 @@ int main()
     if(fpb1 == NULL)
         exit(8);
     fread(&n , sizeof(n) , 1 , fpb1);
-    n=3;///
+    //n=3;///
     char *buff = malloc( n*n );
     fread( buff , n*n , 1 , fpb1);
     struct mapEl **map = creat_map(n);
     Mapinit(buff , n, map);
     char *rndname1=rand_string1();
+    fclose(fpb1);
     for( int i = 0; i == 0 ; ){
          xp= rand()%n ;
          yp= rand()%n ;
+        if( xp == 0 && yp == n-1)
+            continue;
         if( map[yp][xp].type != 3)
             i=1;
     }
     struct cell * head = creat_cellhead(rndname1,xp,yp,0);//*
     if( loadNumber == 1){
         FILE *fp1 ,*fp2 , *fpb1;
-        //i ll  be back
         fpb1 = fopen("testmap.bin","rb");
         fp2 = fopen("testmap.txt","r");
         fp1 = fopen("testcell.txt","r");
         fread(&n,sizeof(n),1,fp2);
-        n=3;///
-        int * info_bin;
+        //n=3;///
+        int * info_bin ;
+        int * info_txt ;
         info_bin = mapinfo_bin("testmap.bin");
         n = info_bin[0];
-        n=3;///
-        mapinfo_txt("testmap.txt",info_bin);//can  return a pointer to make the extra complete
+        //n=3;///
+        mapinfo_txt("testmap.txt",info_bin);
         MapinitFILE(map,n,info_bin);
         int lines=0;
         char namep[5];
@@ -94,17 +97,13 @@ int main()
         fclose(fp1);
         fclose(fpb1);
         fclose(fp2);
-        //fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
-
     }
-   // printf("%d\n",head->energy);
     SetColor(15);
     if( n%2 == 0)
         showMap(n,head,map);
     else
         showMapodd(n,head,map);
     SetColor(13);
-    //show_mainmenu();
     int input=0 ;
 
     int laterinput;
@@ -131,20 +130,32 @@ int main()
 
         if( source != 0 && engypermission == 1){
             SetColor(14);
-            puts("[1]split\n[2]move\n[3]enrgy");
+            puts("[1]split\n[2]move\n[3]enrgy\n[4]save\n[5]exit");
         }
         else if( source == 0 && engypermission == 1 ){
             SetColor(8);
             puts("[1]split");
             SetColor(14);
-            puts("[2]move\n[3]energy");
+            puts("[2]move\n[3]energy\n[4]save\n[5]exit");
         }
         //( source != 0 && engypermission !=1)
-        else {
+        else if(source !=0 && engypermission != 1){
             SetColor(14);
             puts("[1]split\n[2]move");
             SetColor(8);
             puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
+        }
+        else if(source ==0 && engypermission != 1){
+            SetColor(8);
+            puts("[1]split");
+            SetColor(14);
+            puts("[2]move");
+            SetColor(8);
+            puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
         }
        scanf("%d",&laterinput);
        if( laterinput == 1){
@@ -153,10 +164,12 @@ int main()
            }
            counter5 = 1;
            SetColor(15);
-           if( n%2 == 0)
-                showMap(n,head,map);
-           else
-                showMapodd(n,head,map);
+          ///* if( n%2 == 0)
+              ///*  showMap(n,head,map);
+           ///*else
+             ///*   showMapodd(n,head,map);
+           SetColor(5);
+           puts("which cell?");
            int number;
            scanf( "%d", &number );
            struct cell * current = head;
@@ -174,6 +187,9 @@ int main()
 
        }
        if( laterinput == 2){
+            SetColor(5);
+            puts("which cell?");
+            SetColor(14);
             int sum2;
             int permission , count5;
             struct cell * current = head;
@@ -213,7 +229,7 @@ int main()
             result.direct4 = sum%10; sum-=sum%10; sum/=10;
             result.direct5 = sum%10; sum-=sum%10; sum/=10;
             result.direct6 = sum%10; sum-=sum%10; sum/=10;
-            printf("which direction\n");
+            printf("which direction?\n");
             SetColor(14);
             show_moveoptions(result.direct1 , result.direct2 , result.direct3 , result.direct4 , result.direct5 , result.direct6);
             scanf("%d",&input);
@@ -228,7 +244,9 @@ int main()
             fclose(fpb1);
        }
        if( laterinput == 3 ){
+            SetColor(5);
             puts("which cell?");
+            SetColor(14);
             int permission;
             struct cell * current;
             int count4;
@@ -279,6 +297,7 @@ int main()
                 fprintf(fp1,"%s %d %d %d\n",current->name,current->x,current->y,current->energy);
             }
             fwrite(&n,sizeof(n),1,fpb1);
+            fprintf(fp2,"%d\n",n);
             for( int i=0 ; i<n ; i++ ){
                 for( int j=0 ; j<n ; j++ ){
                     int k = map[i][j].type;
@@ -298,8 +317,10 @@ int main()
                     }
                     else{
                         k2=0;
-                    }
-                    fprintf(fp2,"block type= %d block energy= %d block location [%d][%d]\n",k,k2,i,j);
+                    }//fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,k1);
+                    //if(map[i][j].room == 1)
+                        //return 100;
+                    fprintf(fp2,"block type= %d block energy= %d block location [%d][%d] player%d\n",k,k2,i,j,map[i][j].room);
                 }
             }
             fclose(fp1);
@@ -309,6 +330,7 @@ int main()
     }
         return 0;
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if( laterlateinput == 3){
     static int turn;
@@ -321,18 +343,25 @@ int main()
     char *buff = malloc( n*n );
     fread( buff , n*n , 1 , fpb1);
     struct mapEl **map = creat_map(n);
+   // n=4;///
     Mapinit(buff , n, map);
     char *rndname1=rand_string1();
     char *rndname2=rand_string2();
+    fclose(fpb1);
     for( int i = 0; i == 0 ; ){
          xp1= rand()%n ;
          yp1= rand()%n ;
+         if((xp1 == 0 && yp1 == n-1 )|| map[yp1][xp1].room == 1)
+            continue;
         if( map[yp1][xp1].type != 3)
             i=1;
     }
+    map[yp1][xp1].room=1;
     for( int i = 0; i == 0 ; ){
          xp2= rand()%n ;
          yp2= rand()%n ;
+         if((xp2 == 0 && yp2 == n-1 )|| map[yp2][xp2].room == 1)
+            continue;
         if( map[yp2][xp2].type != 3)
             i=1;
     }
@@ -393,8 +422,10 @@ int main()
         }
         fclose(fp1);
     }
-
-    showMap2(n,head1,head2,map);
+    if( n%2 == 0)///
+        showMap2(n,head1,head2,map);
+    else
+        showMap2odd(n,head1,head2,map);
     updateMap(head1,head2,map,n);
     int laterinput = 0;
     while(laterinput != 5){
@@ -426,22 +457,34 @@ int main()
             engypermission = checkenergy(head,map);
 
             if( source != 0 && engypermission == 1){
-                SetColor(14);
-                puts("[1]split\n[2]move\n[3]enrgy");
-            }
-            else if( source == 0 && engypermission == 1 ){
-                SetColor(8);
-                puts("[1]split");
-                SetColor(14);
-                puts("[2]move\n[3]energy");
-            }
-            //( source != 0 && engypermission !=1)
-            else {
-                SetColor(14);
-                puts("[1]split\n[2]move");
-                SetColor(8);
-                puts("[3]energy");
-            }
+            SetColor(14);
+            puts("[1]split\n[2]move\n[3]enrgy\n[4]save\n[5]exit");
+        }
+        else if( source == 0 && engypermission == 1 ){
+            SetColor(8);
+            puts("[1]split");
+            SetColor(14);
+            puts("[2]move\n[3]energy\n[4]save\n[5]exit");
+        }
+        //( source != 0 && engypermission !=1)
+        else if(source !=0 && engypermission != 1){
+            SetColor(14);
+            puts("[1]split\n[2]move");
+            SetColor(8);
+            puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
+        }
+        else if(source ==0 && engypermission != 1){
+            SetColor(8);
+            puts("[1]split");
+            SetColor(14);
+            puts("[2]move");
+            SetColor(8);
+            puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
+        }
             scanf("%d",&laterinput);
             if( laterinput == 1){
                 for( current2 = head ; current2 != NULL ; current2 = current2->next){
@@ -449,7 +492,12 @@ int main()
                 }
                 counter5 = 1;
                 SetColor(15);
-                showMap2(n,head,head2,map);
+              ///*  if( n%2 == 0)///
+                  ///*  showMap2(n,head1,head2,map);
+               ///* else
+                   ///* showMap2odd(n,head1,head2,map);
+                SetColor(5);
+                puts("which cell?");
                 int number;
                 scanf( "%d", &number );
                 struct cell * current = head;
@@ -461,10 +509,16 @@ int main()
                 split(head , current->name , spltcheck , map);
                 SetColor(15);
                 updateMap(head1,head2,map,n);
-                showMap2(n,head,head2,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
 
             }
             if( laterinput == 2){
+                SetColor(5);
+                puts("which cell?");
+                SetColor(14);
                 int sum2;
                 int permission , count5;
                 struct cell * current = head;
@@ -504,7 +558,7 @@ int main()
                 result.direct4 = sum%10; sum-=sum%10; sum/=10;
                 result.direct5 = sum%10; sum-=sum%10; sum/=10;
                 result.direct6 = sum%10; sum-=sum%10; sum/=10;
-                printf("which direction\n");
+                printf("which direction?\n");
                 int input;
                 SetColor(14);
                 show_moveoptions(result.direct1 , result.direct2 , result.direct3 , result.direct4 , result.direct5 , result.direct6);
@@ -512,13 +566,18 @@ int main()
                 movecell(head , current->x , current->y , input , map);
                 SetColor(15);
                 updateMap(head1,head2,map,n);
-                showMap2(n,head,head2,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
                 //printf("Hello world!\n");
                 SetColor(3);
                 fclose(fpb1);
             }
             if( laterinput == 3 ){
+                SetColor(5);
                 puts("which cell?");
+                SetColor(14);
                 int permission;
                 struct cell * current;
                 int count4;
@@ -547,7 +606,10 @@ int main()
                 get_energy(head,permission,current->name);
                 SetColor(15);
                 updateMap(head1,head2,map,n);
-                showMap2(n,head,head2,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
             }
 
 
@@ -646,6 +708,7 @@ int main()
                 fclose(fp1);
                 fclose(fp2);
                 fclose(fpb1);
+                turn--;
             }
          checkendofgame(map,n);
          turn++;
@@ -677,23 +740,35 @@ int main()
             }
             engypermission = checkenergy(head,map);
 
-            if( source != 0 && engypermission == 1){
-                SetColor(14);
-                puts("[1]split\n[2]move\n[3]enrgy");
-            }
-            else if( source == 0 && engypermission == 1 ){
-                SetColor(8);
-                puts("[1]split");
-                SetColor(14);
-                puts("[2]move\n[3]energy");
-            }
-            //( source != 0 && engypermission !=1)
-            else {
-                SetColor(14);
-                puts("[1]split\n[2]move");
-                SetColor(8);
-                puts("[3]energy");
-            }
+             if( source != 0 && engypermission == 1){
+            SetColor(14);
+            puts("[1]split\n[2]move\n[3]enrgy\n[4]save\n[5]exit");
+        }
+        else if( source == 0 && engypermission == 1 ){
+            SetColor(8);
+            puts("[1]split");
+            SetColor(14);
+            puts("[2]move\n[3]energy\n[4]save\n[5]exit");
+        }
+        //( source != 0 && engypermission !=1)
+        else if(source !=0 && engypermission != 1){
+            SetColor(14);
+            puts("[1]split\n[2]move");
+            SetColor(8);
+            puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
+        }
+        else if(source ==0 && engypermission != 1){
+            SetColor(8);
+            puts("[1]split");
+            SetColor(14);
+            puts("[2]move");
+            SetColor(8);
+            puts("[3]energy");
+            SetColor(14);
+            puts("[4]save\n[5]exit");
+        }
             scanf("%d",&laterinput);
             if( laterinput == 1){
                 for( current2 = head ; current2 != NULL ; current2 = current2->next){
@@ -702,7 +777,12 @@ int main()
                 counter5 = 1;
                 SetColor(15);
                 updateMap(head1,head2,map,n);
-                showMap2(n,head1,head,map);
+               ///* if( n%2 == 0)///
+                   ///* showMap2(n,head1,head2,map);
+                ///*else
+                    ///*showMap2odd(n,head1,head2,map);
+                SetColor(5);
+                puts("which cell?");
                 int number;
                 scanf( "%d", &number );
                 struct cell * current = head;
@@ -714,10 +794,15 @@ int main()
                 split(head , current->name , spltcheck , map);
                 SetColor(15);
                 updateMap(head1,head2,map,n);
-                showMap2(n,head1,head,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
 
             }
             if( laterinput == 2){
+                SetColor(5);
+                puts("which cell?");
                 int sum2;
                 int permission , count5;
                 struct cell * current = head;
@@ -757,7 +842,7 @@ int main()
                 result.direct4 = sum%10; sum-=sum%10; sum/=10;
                 result.direct5 = sum%10; sum-=sum%10; sum/=10;
                 result.direct6 = sum%10; sum-=sum%10; sum/=10;
-                printf("which direction\n");
+                printf("which direction?\n");
                 SetColor(14);
                 int input;
                 show_moveoptions(result.direct1 , result.direct2 , result.direct3 , result.direct4 , result.direct5 , result.direct6);
@@ -765,13 +850,18 @@ int main()
                 movecell(head , current->x , current->y , input , map);
                 updateMap(head1,head2,map,n);
                 SetColor(15);
-                showMap2(n,head1,head,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
                 //printf("Hello world!\n");
                 SetColor(3);
                 fclose(fpb1);
             }
             if( laterinput == 3 ){
+                SetColor(5);
                 puts("which cell?");
+                SetColor(14);
                 int permission;
                 struct cell * current;
                 int count4;
@@ -800,7 +890,10 @@ int main()
                 get_energy(head,permission,current->name);
                 updateMap(head1,head2,map,n);
                 SetColor(15);
-                showMap2(n,head1,head,map);
+                if( n%2 == 0)///
+                    showMap2(n,head1,head2,map);
+                else
+                    showMap2odd(n,head1,head2,map);
             }
 
             if( laterinput == 4 ){
@@ -898,6 +991,7 @@ int main()
                 fclose(fp1);
                 fclose(fp2);
                 fclose(fpb1);
+                turn--;
             }
             checkendofgame(map,n);
          turn++;
